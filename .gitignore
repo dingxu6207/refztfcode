@@ -21,3 +21,8 @@ $RECYCLE.BIN/
 # =========================
 # Operating System Files
 # =========================
+*.hdf5
+*.pkl
+*.csv
+*.txt
+*.lc
