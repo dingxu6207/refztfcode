@@ -12,7 +12,7 @@ from PyAstronomy.pyTiming import pyPDM
 import matplotlib.pylab as plt
 from scipy import interpolate
 
-CSV_FILE_PATH = 'data\\2168.csv'
+CSV_FILE_PATH = 'data\\10.csv'
 dfdata = pd.read_csv(CSV_FILE_PATH)
 
 hjd = dfdata['HJD']
@@ -32,7 +32,7 @@ hang = rg['g']
 nphjd = nphjd[hang:]
 npmag = npmag[hang:]-np.mean(npmag[hang:])
 
-P = 0.3676728
+P = 0.2557214
 phases = foldAt(nphjd, P)
 sortIndi = np.argsort(phases)
 phases = phases[sortIndi]
@@ -84,7 +84,7 @@ plt.plot(phrase, flux,'.')
 
 
 
-s = np.diff(flux,2).std()/np.sqrt(6)
+s = np.diff(flux,2).std()/np.sqrt(7.5)
 sx1 = np.linspace(0,1,100)
 func1 = interpolate.UnivariateSpline(phrase, flux,s=s*s*lenr,ext=3)#强制通过所有点
 sy1 = func1(sx1)

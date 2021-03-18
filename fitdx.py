@@ -17,6 +17,7 @@ from tensorflow.keras.models import load_model
 #import tools_32 as sim
 #from pyhht.emd import EMD
 import pandas as pd
+import fitfunction
 
 inclmodel = load_model('incl.hdf5')
 allmodel = load_model('all11.hdf5')
@@ -24,6 +25,14 @@ dropmodel = load_model('alldrop.hdf5')
 accmodel = load_model('accall.hdf5')
 alll3model = load_model('l3/alll3.hdf5')
 l3model = load_model('l3/l300.hdf5')
+
+
+def calculater(ydata, caldata):
+    res_ydata  = np.array(ydata) - np.array(caldata)
+    ss_res     = np.sum(res_ydata**2)
+    ss_tot     = np.sum((ydata - np.mean(ydata))**2)
+    r_squared  = 1 - (ss_res / ss_tot)
+    return r_squared
 
 def predictdata(sy1):
        
@@ -80,7 +89,7 @@ l3infotemp = []
 file='alldata/0000.pkl'
 dat=pickle.load(open(file,'rb'))
 tot=len(dat)
-for i in range(0,tot):
+for i in range(0,5):
     try:
         ID = dat[i][0]
         name=dat[i][1]
@@ -104,7 +113,7 @@ for i in range(0,tot):
         #predictdatal3(sy1)
         predata.append(incdata)
         predata.append(ID)
-        infotemp.append(predata)
+        
         
         l3predata,l3incdata = predictdatal3(sy1)
         l3predata = l3predata[0].tolist()
@@ -113,21 +122,36 @@ for i in range(0,tot):
         l3predata.append(ID)
         l3infotemp.append(l3predata)
         
+        try:
+            times,resultflux = fitfunction.plotphoebe(predata,phrase)
+            r_squared = calculater(resultflux,flux)
+            predata.append(r_squared)
+        except:
+            predata.append(0)
+            print('phoebe ids error')
+        
+        infotemp.append(predata)
         plt.clf()
         plt.figure(1)
         plt.plot(phrase,flux,'.')
         plt.plot(sx1,sy1,'.')
+        
+        try:
+            plt.plot(times, resultflux,'.')
+        except:
+            print('plotphoebe ids error')
+            
         plt.title(ID)
         ax = plt.gca()
         ax.yaxis.set_ticks_position('left') #将y轴的位置设置在右边
         ax.invert_yaxis() #y轴反向
-        #plt.pause(0.5)
+        plt.pause(1)
         
         
     except:
         print('it is error!'+str(i))
   
-name=['incl1','q','r','t2/t1','inc2','ID']      
+name=['incl1','q','r','t2/t1','inc2','ID','R2']      
 test = pd.DataFrame(columns=name,data=infotemp)#数据有三列，列名分别为one,two,three
 test.to_csv('e:/testcsv.csv',encoding='gbk')
 
